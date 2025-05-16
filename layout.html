@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Due Process AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">Due Process AI</div>
+        <button class="menu-toggle" onclick="toggleMenu()">Menu</button>
+        <div id="nav-links" class="nav-links hidden">
+            <a href="/">Home</a>
+            <a href="/start_case">Start New Case</a>
+            <a href="/view_cases">View Cases</a>
+            <a href="/document_generation">Document Generator</a>
+            <a href="/upload_evidence">Upload Evidence</a>
+            <a href="/filing_toolkit">Filing Toolkit</a>
+            <a href="/charge_interpreter">Charge Interpreter</a>
+            <a href="/document_risk_checker">Document Risk Checker</a>
+            <a href="/evidence_analysis">Evidence Analysis Tool</a>
+            <a href="/due_process_analyzer">Due Process Analyzer</a>
+            <a href="/investigator_tools">Investigator Tools</a>
+        </div>
+    </nav>
+    <main>{% block content %}{% endblock %}</main>
+    <script>
+        function toggleMenu() {
+            const links = document.getElementById('nav-links');
+            links.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
