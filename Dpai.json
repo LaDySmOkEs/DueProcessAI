@@ -1,0 +1,1107 @@
+{
+  "version": 2,
+  "id": "due-process-ai",
+  "name": "Due Process AI",
+  "appVariables": [
+    {
+      "id": "currentCase",
+      "initialValue": null
+    },
+    {
+      "id": "currentUser",
+      "initialValue": null
+    },
+    {
+      "id": "isLoggedIn",
+      "initialValue": false
+    }
+  ],
+  "properties": {
+    "layout": "stack",
+    "theme": "dark"
+  },
+  "pages": [
+    {
+      "id": "login",
+      "name": "Login",
+      "isInitialPage": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Due Process AI",
+            "textAlign": "center",
+            "fontSize": "xl"
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "Legal assistance powered by AI",
+            "textAlign": "center",
+            "marginBottom": 24
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "email",
+          "props": {
+            "label": "Email",
+            "placeholder": "Enter your email",
+            "type": "email"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "password",
+          "props": {
+            "label": "Password",
+            "placeholder": "Enter your password",
+            "type": "password"
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Login",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "signIn",
+              "resource": "Supabase",
+              "params": {
+                "email": "{{email}}",
+                "password": "{{password}}"
+              },
+              "successActions": [
+                {
+                  "action": "setVariable",
+                  "name": "currentUser",
+                  "value": "{{authUser}}"
+                },
+                {
+                  "action": "setVariable",
+                  "name": "isLoggedIn",
+                  "value": true
+                },
+                {
+                  "action": "navigate",
+                  "pageId": "dashboard"
+                }
+              ],
+              "errorActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Login failed. Please check your credentials.",
+                  "type": "error"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Register",
+            "variant": "outline",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "register"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "register",
+      "name": "Register",
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Create Account",
+            "textAlign": "center"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "fullname",
+          "props": {
+            "label": "Full Name",
+            "placeholder": "Enter your full name"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "registerEmail",
+          "props": {
+            "label": "Email",
+            "placeholder": "Enter your email",
+            "type": "email"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "registerPassword",
+          "props": {
+            "label": "Password",
+            "placeholder": "Create a password",
+            "type": "password"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "confirmPassword",
+          "props": {
+            "label": "Confirm Password",
+            "placeholder": "Confirm your password",
+            "type": "password"
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Create Account",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "condition": "{{registerPassword === confirmPassword}}",
+              "action": "signUp",
+              "resource": "Supabase",
+              "params": {
+                "email": "{{registerEmail}}",
+                "password": "{{registerPassword}}",
+                "data": {
+                  "full_name": "{{fullname}}"
+                }
+              },
+              "successActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Account created successfully! Please login.",
+                  "type": "success"
+                },
+                {
+                  "action": "navigate",
+                  "pageId": "login"
+                }
+              ],
+              "errorActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Registration failed. Please try again.",
+                  "type": "error"
+                }
+              ]
+            },
+            {
+              "type": "onPress",
+              "condition": "{{registerPassword !== confirmPassword}}",
+              "action": "showNotification",
+              "message": "Passwords do not match",
+              "type": "error"
+            }
+          ]
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Back to Login",
+            "variant": "text",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "login"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "My Legal Dashboard"
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "Welcome, {{currentUser.user_metadata.full_name}}",
+            "fontWeight": "bold",
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Start New Case",
+            "fullWidth": true,
+            "marginBottom": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "start-case"
+            }
+          ]
+        },
+        {
+          "component": "Title",
+          "props": {
+            "text": "My Active Cases",
+            "fontSize": "lg",
+            "marginTop": 24,
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "DataTable",
+          "id": "cases",
+          "props": {
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "cases",
+                "options": {
+                  "columns": "id,title,created_at,status",
+                  "where": [["user_id", "eq", "{{currentUser.id}}"]]
+                }
+              }
+            },
+            "columns": [
+              {
+                "title": "Case Title",
+                "dataIndex": "title"
+              },
+              {
+                "title": "Date Created",
+                "dataIndex": "created_at",
+                "render": "{{formatDate(value, 'MMM D, YYYY')}}"
+              },
+              {
+                "title": "Status",
+                "dataIndex": "status"
+              },
+              {
+                "title": "Actions",
+                "render": "<Button text='View' onPress={() => viewCase(record.id)} />"
+              }
+            ]
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "functionName": "viewCase",
+              "params": ["id"],
+              "action": "compose",
+              "actions": [
+                {
+                  "action": "setVariable",
+                  "name": "currentCase",
+                  "value": "{{id}}"
+                },
+                {
+                  "action": "navigate",
+                  "pageId": "case-details"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "ButtonRow",
+          "props": {
+            "alignment": "center",
+            "marginTop": 24
+          },
+          "elements": [
+            {
+              "component": "Button",
+              "props": {
+                "text": "Due Process Analyzer",
+                "variant": "outline"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "action": "navigate",
+                  "pageId": "due-process-analyzer"
+                }
+              ]
+            },
+            {
+              "component": "Button",
+              "props": {
+                "text": "Document Generator",
+                "variant": "outline"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "action": "navigate",
+                  "pageId": "document-generator"
+                }
+              ]
+            },
+            {
+              "component": "Button",
+              "props": {
+                "text": "Charge Interpreter",
+                "variant": "outline"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "action": "navigate",
+                  "pageId": "charge-interpreter"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "start-case",
+      "name": "Start New Case",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Start a New Case"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "caseTitle",
+          "props": {
+            "label": "Case Title",
+            "placeholder": "Enter your case title"
+          }
+        },
+        {
+          "component": "TextArea",
+          "id": "caseDescription",
+          "props": {
+            "label": "Case Description",
+            "placeholder": "Describe your legal situation",
+            "minHeight": 120
+          }
+        },
+        {
+          "component": "Select",
+          "id": "caseType",
+          "props": {
+            "label": "Case Type",
+            "placeholder": "Select a case type",
+            "options": [
+              { "label": "Criminal Defense", "value": "criminal" },
+              { "label": "Civil Matter", "value": "civil" },
+              { "label": "Traffic Violation", "value": "traffic" },
+              { "label": "Family Law", "value": "family" },
+              { "label": "Other", "value": "other" }
+            ]
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Submit Case",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "createRecord",
+              "resource": "Supabase",
+              "table": "cases",
+              "fields": {
+                "title": "{{caseTitle}}",
+                "description": "{{caseDescription}}",
+                "type": "{{caseType}}",
+                "user_id": "{{currentUser.id}}",
+                "status": "active"
+              },
+              "successActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Case created successfully",
+                  "type": "success"
+                },
+                {
+                  "action": "navigate",
+                  "pageId": "dashboard"
+                }
+              ],
+              "errorActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Failed to create case",
+                  "type": "error"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Back to Dashboard",
+            "variant": "outline",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "dashboard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "case-details",
+      "name": "Case Details",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "DataView",
+          "id": "caseData",
+          "props": {
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "cases",
+                "options": {
+                  "where": [["id", "eq", "{{currentCase}}"]]
+                }
+              }
+            }
+          }
+        },
+        {
+          "component": "Title",
+          "props": {
+            "text": "{{caseData.data[0].title}}",
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "Status: {{caseData.data[0].status}}",
+            "fontWeight": "bold",
+            "marginBottom": 6
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "Type: {{caseData.data[0].type}}",
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "Description:",
+            "fontWeight": "bold",
+            "marginBottom": 6
+          }
+        },
+        {
+          "component": "Text",
+          "props": {
+            "text": "{{caseData.data[0].description}}",
+            "marginBottom": 24
+          }
+        },
+        {
+          "component": "Title",
+          "props": {
+            "text": "Evidence Files",
+            "fontSize": "lg",
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "DataTable",
+          "id": "evidenceFiles",
+          "props": {
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "evidence",
+                "options": {
+                  "columns": "id,file_url,notes,created_at",
+                  "where": [["case_id", "eq", "{{currentCase}}"]]
+                }
+              }
+            },
+            "columns": [
+              {
+                "title": "Date Added",
+                "dataIndex": "created_at",
+                "render": "{{formatDate(value, 'MMM D, YYYY')}}"
+              },
+              {
+                "title": "Notes",
+                "dataIndex": "notes"
+              },
+              {
+                "title": "File",
+                "dataIndex": "file_url",
+                "render": "<Link text='View File' href={{value}} target='_blank' />"
+              }
+            ],
+            "emptyText": "No evidence files uploaded yet"
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Upload Evidence",
+            "marginTop": 12,
+            "marginBottom": 24
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "upload-evidence",
+              "params": {
+                "caseId": "{{currentCase}}"
+              }
+            }
+          ]
+        },
+        {
+          "component": "Title",
+          "props": {
+            "text": "Case Notes",
+            "fontSize": "lg",
+            "marginBottom": 12
+          }
+        },
+        {
+          "component": "DataTable",
+          "id": "caseNotes",
+          "props": {
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "case_notes",
+                "options": {
+                  "columns": "id,content,created_at",
+                  "where": [["case_id", "eq", "{{currentCase}}"]]
+                }
+              }
+            },
+            "columns": [
+              {
+                "title": "Date",
+                "dataIndex": "created_at",
+                "render": "{{formatDate(value, 'MMM D, YYYY')}}"
+              },
+              {
+                "title": "Note",
+                "dataIndex": "content"
+              }
+            ],
+            "emptyText": "No notes added yet"
+          }
+        },
+        {
+          "component": "TextArea",
+          "id": "newNote",
+          "props": {
+            "placeholder": "Add a note about this case...",
+            "marginTop": 12
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Add Note",
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "createRecord",
+              "resource": "Supabase",
+              "table": "case_notes",
+              "fields": {
+                "case_id": "{{currentCase}}",
+                "content": "{{newNote}}",
+                "user_id": "{{currentUser.id}}"
+              },
+              "successActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Note added successfully",
+                  "type": "success"
+                },
+                {
+                  "action": "refresh",
+                  "componentId": "caseNotes"
+                },
+                {
+                  "action": "setValue",
+                  "componentId": "newNote",
+                  "value": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "ButtonRow",
+          "props": {
+            "marginTop": 24
+          },
+          "elements": [
+            {
+              "component": "Button",
+              "props": {
+                "text": "Back to Dashboard",
+                "variant": "outline"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "action": "navigate",
+                  "pageId": "dashboard"
+                }
+              ]
+            },
+            {
+              "component": "Button",
+              "props": {
+                "text": "Generate Document for this Case",
+                "variant": "primary"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "action": "navigate",
+                  "pageId": "document-generator",
+                  "params": {
+                    "caseContext": "{{caseData.data[0].title}}: {{caseData.data[0].description}}"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "upload-evidence",
+      "name": "Upload Evidence",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Upload Evidence"
+          }
+        },
+        {
+          "component": "InputField",
+          "id": "fileUrl",
+          "props": {
+            "label": "Evidence File URL",
+            "placeholder": "Paste a file link"
+          }
+        },
+        {
+          "component": "TextArea",
+          "id": "fileNotes",
+          "props": {
+            "label": "Notes",
+            "placeholder": "Describe this file"
+          }
+        },
+        {
+          "component": "FileUpload",
+          "id": "evidenceFile",
+          "props": {
+            "label": "Or Upload File Directly",
+            "acceptedFileTypes": ".pdf,.doc,.docx,.jpg,.png,.txt",
+            "resource": "Supabase",
+            "bucket": "evidence-files",
+            "path": "user-{{currentUser.id}}/case-{{params.caseId}}/"
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Submit Evidence",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "createRecord",
+              "resource": "Supabase",
+              "table": "evidence",
+              "fields": {
+                "case_id": "{{params.caseId}}",
+                "file_url": "{{evidenceFile.url || fileUrl}}",
+                "notes": "{{fileNotes}}",
+                "user_id": "{{currentUser.id}}"
+              },
+              "successActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Evidence uploaded successfully",
+                  "type": "success"
+                },
+                {
+                  "action": "navigate",
+                  "pageId": "case-details"
+                }
+              ],
+              "errorActions": [
+                {
+                  "action": "showNotification",
+                  "message": "Failed to upload evidence",
+                  "type": "error"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Back to Case",
+            "variant": "outline",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "case-details"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "due-process-analyzer",
+      "name": "Due Process Analyzer",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Due Process Analyzer"
+          }
+        },
+        {
+          "component": "Select",
+          "id": "caseSelect",
+          "props": {
+            "label": "Select Related Case (Optional)",
+            "placeholder": "Choose a case for context",
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "cases",
+                "options": {
+                  "columns": "id,title",
+                  "where": [["user_id", "eq", "{{currentUser.id}}"]]
+                }
+              }
+            },
+            "labelField": "title",
+            "valueField": "id"
+          }
+        },
+        {
+          "component": "TextArea",
+          "id": "analyzerInput",
+          "props": {
+            "label": "Enter Legal Question",
+            "placeholder": "Ask a due process or legal question",
+            "minHeight": 120
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Submit to AI",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "callApi",
+              "resource": "OpenAI",
+              "endpoint": "chat",
+              "params": {
+                "model": "gpt-4",
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You are a legal assistant specializing in due process and constitutional rights. Provide factual, clear explanations based on US law. Include relevant case law when applicable. Your goal is to help people understand their legal rights in plain language."
+                  },
+                  {
+                    "role": "user",
+                    "content": "{{analyzerInput}}"
+                  }
+                ]
+              },
+              "saveTo": "aiResponse",
+              "successActions": [
+                {
+                  "action": "createRecord",
+                  "condition": "{{caseSelect !== null && caseSelect !== ''}}",
+                  "resource": "Supabase",
+                  "table": "ai_responses",
+                  "fields": {
+                    "case_id": "{{caseSelect}}",
+                    "query": "{{analyzerInput}}",
+                    "response": "{{aiResponse.choices[0].message.content}}",
+                    "user_id": "{{currentUser.id}}"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Card",
+          "id": "aiResponseCard",
+          "condition": "{{aiResponse !== undefined}}",
+          "props": {
+            "marginTop": 24,
+            "padding": 16
+          },
+          "elements": [
+            {
+              "component": "Text",
+              "props": {
+                "text": "{{aiResponse.choices[0].message.content}}",
+                "style": {
+                  "whiteSpace": "pre-wrap"
+                }
+              }
+            },
+            {
+              "component": "Button",
+              "props": {
+                "text": "Save Response",
+                "marginTop": 12,
+                "variant": "outline"
+              },
+              "events": [
+                {
+                  "type": "onPress",
+                  "condition": "{{caseSelect === null || caseSelect === ''}}",
+                  "action": "showNotification",
+                  "message": "Please select a case to save this response",
+                  "type": "warning"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Back to Dashboard",
+            "variant": "outline",
+            "fullWidth": true,
+            "marginTop": 24
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "navigate",
+              "pageId": "dashboard"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "document-generator",
+      "name": "Document Generator",
+      "authRequired": true,
+      "elements": [
+        {
+          "component": "Title",
+          "props": {
+            "text": "Generate Legal Document"
+          }
+        },
+        {
+          "component": "Select",
+          "id": "docType",
+          "props": {
+            "label": "Document Type",
+            "placeholder": "Select document type",
+            "options": [
+              { "label": "Motion to Dismiss", "value": "dismiss" },
+              { "label": "Motion to Suppress", "value": "suppress" },
+              { "label": "Discovery Request", "value": "discovery" },
+              { "label": "Appeal Brief", "value": "appeal" },
+              { "label": "General Motion", "value": "motion" },
+              { "label": "Custom Document", "value": "custom" }
+            ]
+          }
+        },
+        {
+          "component": "Select",
+          "id": "docCaseSelect",
+          "props": {
+            "label": "Select Related Case",
+            "placeholder": "Choose a case for context",
+            "dataSource": {
+              "type": "resource",
+              "resource": "Supabase",
+              "method": "from",
+              "params": {
+                "table": "cases",
+                "options": {
+                  "columns": "id,title",
+                  "where": [["user_id", "eq", "{{currentUser.id}}"]]
+                }
+              }
+            },
+            "labelField": "title",
+            "valueField": "id"
+          }
+        },
+        {
+          "component": "TextArea",
+          "id": "docPrompt",
+          "props": {
+            "label": "Describe What You Need",
+            "placeholder": "e.g., Create a motion to dismiss based on...",
+            "defaultValue": "{{params.caseContext ? 'Based on this case: ' + params.caseContext + '\\n\\nPlease create a ' : ''}}",
+            "minHeight": 120
+          }
+        },
+        {
+          "component": "Button",
+          "props": {
+            "text": "Generate Document",
+            "fullWidth": true,
+            "marginTop": 12
+          },
+          "events": [
+            {
+              "type": "onPress",
+              "action": "callApi",
+              "resource": "OpenAI",
+              "endpoint": "chat",
+              "params": {
+                "model": "gpt-4",
+                "messages": [
+                  {
+                    "role": "system",
+                    "content": "You are a legal document assistant. Generate professional legal documents in proper format based on the user's request. Use appropriate legal language, format, and structure based on the document type requested. For motions, include proper headers, case captions, introductory statements, factual background, legal arguments with citations when possible, and conclusion with prayer for relief."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Generate a {{docType !== 'custom' ? docType + ' document' : 'legal document'}} with the following details: {{docPrompt}}"
+                  }
+                ]
+              },
+              "saveTo": "docOutput",
+              "successActions": [
+                {
+                  "action": "createRecord",
+                  "condition": "{{docCaseSelect !== null && docCaseSelect !== ''}}",
+                  "resource": "Supabase",
+                  "table": "generated_documents",
+                  "fields": {
+                    "case_id": "{{docCaseSelect}}",
+                    "doc_type": "{{docType}}",
+                    "prompt": "{{docPrompt}}",
+                    "content": "{{docOutput.choices[0].message.content}}",
+                    "user_id": "{{currentUser.id}}"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "component": "Card",
+          "id": "docOutputCard",
+          "condition": "{{docOutput !== undefined}}",
+          "props": {
+            "marginTop": 24,
+            "padding": 16
+          },
+          "elements": [
+            {
+              "component": "Text",
+              "props": {
+                "text": "{{docOutput.choices[0].message.content}}",
+                "style": {
+                  "whiteSpace": "pre-wrap"
+                }
+              }
+            },
+            {
+              "component": "ButtonRow",
+              "props": {
+                "marginTop": 12
+              },
+              "elements": [
+                {
+                  "component": "Button",
+                  "props": {
+                    "text": "Copy to Clipboard",
+                    "variant": "outline"
+                  },
+                  "events": [
+                    {
+                      "type": "onPress",
+                      "action": "copyToClipboard",
+                      "value": "{{
