@@ -1,4 +1,0 @@
-Flask
-openai
-python-dotenv
-gunicorn
